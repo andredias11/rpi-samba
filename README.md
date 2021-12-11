@@ -3,23 +3,20 @@ Docker container that creates a SMB share.
 ## Running
 
 ```
-docker run -d \
-  -p 137:137/udp \
-  -p 138:138/udp \
-  -p 139:139 \
-  -p 445:445 \
-  -p 445:445/udp \
-  --restart='always' \
-  --hostname 'filer' \
-  -v /media/stick:/share/stick \
-  --name samba dastrasmue/rpi-samba:v3 \
-  -u "alice:abc123" \
-  -u "bob:secret" \
-  -s "Backup directory:/share/stick/backups:rw:alice,bob" \
-  -s "Alice (private):/share/stick/data/alice:rw:alice" \
-  -s "Bob (private):/share/stick/data/bob:rw:bob" \
-  -s "Documents (readonly):/share/stick/data/documents:ro:alice,bob"
-  -s "Public (readonly):/share/stick/data/public:ro:"
+version: '3'
+services:
+  smb:
+    image: charlesmknox/rpi-samba:v2
+    restart: always
+    ports:
+      - 137:137
+      - 138:138
+      - 139:139
+      - 445:445
+    hostname: parenthostname
+    volumes:
+      - /mnt/smbsharefolder:/share/data
+    command: -u "user:password" -u "user2:password" -s "backup:/share/data:rw:user,user2"
 ```
 
 This example will bind `smbd` to docker host ip address
